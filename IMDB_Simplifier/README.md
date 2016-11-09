@@ -1,1 +1,0 @@
-# IMDB Simplifier, First Assignment
