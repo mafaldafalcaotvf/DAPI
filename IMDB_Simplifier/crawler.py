@@ -37,7 +37,9 @@ def fetchAndStoreName(res):
     r2 = requests.get('http://imdb.wemakesites.net/api/' + res)
 
     if r2.status_code == 200:
-        es.index(index='names', doc_type='name', id=res, body=json.loads(r2.content))
+        js = json.loads(r2.content)
+        js['crawltimestamp'] = datetime.today()
+        es.index(index='names', doc_type='name', id=res, body=js)
     else:
         print("Failed to fetch specific resource " + res)
 
@@ -46,8 +48,9 @@ def fetchAndStoreTitle(res):
     r2 = requests.get('http://imdb.wemakesites.net/api/' + res)
 
     if r2.status_code == 200:
-        jsonContent = json.loads(r2.content)
-        es.index(index='titles', doc_type='title', id=res, body=jsonContent)
+        js = json.loads(r2.content)
+        js['crawltimestamp'] = datetime.today()
+        es.index(index='titles', doc_type='title', id=res, body=js)
     else:
         print("Failed to fetch specific resource " + res)
 
