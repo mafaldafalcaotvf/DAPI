@@ -30,26 +30,6 @@ count = 10
 fetchedTitles = set()
 fetchedNames  = set()
 
-# --- Transformers ---
-
-def transformDuration(jsonContent):
-    t = 0
-    duration = jsonContent['data']['duration']
-
-    try:
-        t = datetime.strptime(duration, '%Hh %Mmin').time()
-        jsonContent['data']['duration'] = t.hour * 60 + t.minute
-    except ValueError:
-        try:
-            t = datetime.strptime(duration, '%Mmin').time()
-            jsonContent['data']['duration'] = t.minute
-        except:
-            try:
-                t = datetime.strptime(duration, '%Hh').time()
-                jsonContent['data']['duration'] = t.hour * 60
-            except:
-                print("Unrecognized duration format: " + duration)
-
 # --- Fetch and Store ---
 
 def fetchAndStoreName(res):
@@ -67,7 +47,6 @@ def fetchAndStoreTitle(res):
 
     if r2.status_code == 200:
         jsonContent = json.loads(r2.content)
-        transformDuration(jsonContent)
         es.index(index='titles', doc_type='title', id=res, body=jsonContent)
     else:
         print("Failed to fetch specific resource " + res)
