@@ -46,21 +46,31 @@ def transformYear(jsonContent):
 
         if year is None:
             print('Found None on year')
+        else:
+            try:
+                if not year.isdigit():
+                    ym = re.search("([0-9]+)", year)
+                    year = int(ym.group(1))
+            except:
+                print("Unrecognized year format: " + year)
+                year = None
+
+        film['year'] = year
+
+def transformInfo(jsonContent):
+    for film in jsonContent['data']['filmography']:
+        info = film['info']
+
+        if info is None:
+            print('Found None on info')
             return
 
         try:
-            if year.isdigit():
-                film['year'] = year
-            else:
-                ym = re.search("([0-9]+)", year)
-                year = ym.group(1)
-                film = year
-                #print("No digit")
+            inf = re.search("/(tt[0-9]+)/", info)
+            info = inf.group(1)
+            film['info'] = info
         except:
-            print("Unrecognized year format: " + year)
-
-
-# def transformInfo(jsonContent)
+            print("Unrecognized info format: " + info)
 
 # Fetching Functions
 
@@ -76,10 +86,10 @@ def fetchAndTransformTitles(docId):
 def fetchAndTransformNames(docId):
     jsonContent = es.get(index='names', doc_type='name', id=docId)['_source']
 
-    print('Enriching title ' + docId)
+    print('Enriching name ' + docId)
 
     transformYear(jsonContent)
-    #transformInfo(jsonContent)
+    transformInfo(jsonContent)
 
     es.index(index='richnames', doc_type='name', id=docId, body=jsonContent)
 
@@ -103,6 +113,3 @@ def transformNames():
 
 
 transformNames()
-#doc = json.loads('{ "data": {"year": "2007x"} }')
-#transformYear(doc)
-#print(doc)
