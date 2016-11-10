@@ -13,10 +13,14 @@ import re
 import json
 #import requests
 import urllib2
-import html2text
+from html2text import html2text
 from datetime import datetime
 from elasticsearch import Elasticsearch
 from BeautifulSoup import BeautifulSoup
+import sys
+
+reload(sys)
+sys.setdefaultencoding('utf8')
 
 es = Elasticsearch([{'host': 'localhost', 'port': 9200}])
 es.indices.create(index='richtitles', ignore=400)
@@ -72,12 +76,8 @@ def transformBio(id, jsonContent):
     soup = BeautifulSoup(urllib2.urlopen('http://www.imdb.com/name/' + id + '/bio?ref=nm_ov_bio_sm').read())
 
     text = soup.find('div', {'class' : 'soda odd'})
-    #print(text)
-    txt = text.get_text(text)
-    bio = txt
-    #bio = html2text.html2text()
-
-
+    if text is not None:
+        jsonContent['data']['description'] = html2text(str(text))
 
 def transformInfo(jsonContent):
     for film in jsonContent['data']['filmography']:
