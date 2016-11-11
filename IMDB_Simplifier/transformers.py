@@ -136,3 +136,4 @@ def transformNames():
 
 
 transformNames()
+transformTitles()
